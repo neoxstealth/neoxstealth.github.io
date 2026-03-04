@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>NEOXSTEALTH | Global Network v7.1</title>
+    <title>NEOXSTEALTH | System v8.0</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
         :root {
@@ -24,11 +24,8 @@
 
         /* --- Pincode Overlay --- */
         #pin-overlay {
-            position: fixed; inset: 0;
-            background: #000; z-index: 10000;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            text-align: center;
+            position: fixed; inset: 0; background: #000; z-index: 10000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         #pin-input {
             background: transparent; border: 1px solid var(--matrix-green);
@@ -36,73 +33,99 @@
             padding: 10px; width: 180px; outline: none; margin-top: 20px;
             letter-spacing: 8px; border-radius: var(--radius);
         }
-        .pin-warning { color: #fff; font-size: 1.1rem; margin-top: 15px; font-weight: bold; text-transform: uppercase; }
-        
-        #access-granted { 
-            color: var(--matrix-green); 
-            font-size: 2.5rem; 
-            font-weight: bold; 
-            display: none; 
-            margin-top: 20px; 
-            text-shadow: 0 0 15px var(--matrix-green); 
-        }
+        #pin-error { color: var(--interface-red); margin-top: 10px; font-weight: bold; display: none; }
+        #access-granted { color: var(--matrix-green); font-size: 1.5rem; font-weight: bold; display: none; margin-top: 20px; }
 
         /* --- Main Layout --- */
         .app-container {
             display: grid;
-            grid-template-columns: 1fr 380px;
-            grid-template-rows: 1fr 240px;
+            grid-template-columns: 1fr 350px;
             height: 100vh; width: 100vw;
             display: none; 
         }
 
-        /* --- Frame Sectie (Links Boven) --- */
-        main { grid-column: 1; grid-row: 1; background: #000; position: relative; border-right: 1px solid #222; }
-        iframe#neoxchat-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        main { grid-column: 1; background: #000; position: relative; border-right: 1px solid #222; height: 100vh; }
+        iframe#neoxchat-frame { width: 100%; height: 100%; border: none; }
 
-        /* --- Gift Alert Visuals --- */
-        #gift-alert-overlay {
-            position: fixed; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 9000; pointer-events: none; display: none;
+        /* Rechts: Sidebar Fixed Layout */
+        .sidebar { 
+            grid-column: 2; 
+            background: var(--panel-bg); 
+            display: flex; 
+            flex-direction: column; 
+            border-left: 1px solid #222; 
+            height: 100vh; /* Vul de hele hoogte */
         }
-        #gift-alert-overlay img { width: 150px; border: 2px solid var(--matrix-green); box-shadow: 0 0 20px var(--matrix-green); border-radius: var(--radius); }
-
-        /* --- Fotoalbum --- */
-        .album-section { grid-column: 1; grid-row: 2; background: #080808; border-top: 2px solid var(--matrix-green); display: flex; flex-direction: column; padding: 10px; overflow: hidden; }
-        .album-title { font-size: 1rem; color: #fff; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #333; }
-        .photo-album { display: flex; gap: 10px; overflow-x: auto; align-items: center; flex-grow: 1; }
-        .album-item { flex: 0 0 160px; height: 160px; border: 1px solid #333; cursor: pointer; border-radius: var(--radius); overflow: hidden; }
-        .album-item img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* --- ZIJBALK: CHATBRO LIVE CHAT --- */
-        .sidebar { grid-column: 2; grid-row: 1; background: var(--panel-bg); display: flex; flex-direction: column; border-left: 1px solid #222; }
-        .status-bar { background: #111; padding: 10px; border-bottom: 1px solid #222; font-size: 0.7rem; color: var(--interface-red); }
-        .stealth-bio { padding: 10px; font-size: 0.8rem; color: #eee; border-bottom: 1px solid #222; }
         
-        #chatbro-container { flex-grow: 1; background: #000; }
+        .status-bar { background: #111; padding: 8px; font-size: 0.7rem; border-bottom: 1px solid #222; color: #fff; flex-shrink: 0; }
+        
+        /* Chatbro neemt alle beschikbare ruimte in */
+        #chatbro-container { 
+            flex: 1; 
+            background: #000; 
+            overflow: hidden; 
+        }
 
-        /* --- Gift Console --- */
-        .gift-console { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 10px; background: #080808; }
-        .gift-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 6px; font-size: 0.7rem; cursor: pointer; border-radius: var(--radius); }
-        .gift-btn:disabled { opacity: 0.3; }
-        #cooldown-timer { color: var(--interface-red); font-weight: bold; float: right; }
+        /* De onderste sectie (Logo, Bio, VPN, Gifts) */
+        .sidebar-bottom-controls {
+            flex-shrink: 0; /* Zorgt dat dit niet kleiner wordt */
+            background: #000;
+        }
 
-        /* --- Logo Sectie --- */
-        .logo-container { grid-column: 2; grid-row: 2; background: #000; border-left: 1px solid #222; border-top: 2px solid var(--matrix-green); display: flex; justify-content: center; align-items: center; padding: 10px; }
-        .logo-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .sidebar-logo { 
+            padding: 15px 10px; 
+            text-align: center; 
+            border-top: 2px solid #222; 
+        }
+        .sidebar-logo img { 
+            width: 85%; 
+            height: auto; 
+            max-height: 120px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 5px var(--matrix-green));
+        }
 
-        #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; }
-        #lightbox img { max-width: 80%; max-height: 80%; border: 2px solid var(--matrix-green); }
+        .stealth-bio {
+            background: #0a0a0a; color: #fff; font-size: 0.7rem; padding: 8px;
+            text-align: center; border-top: 1px solid #222; border-bottom: 1px solid #222;
+            font-style: italic; text-transform: uppercase;
+        }
+        .bio-prefix { color: var(--matrix-green); font-weight: bold; font-size: 0.6rem; display: block; }
+
+        .vpn-module { background: #0d0d0d; padding: 10px; border-bottom: 1px solid #222; }
+        .vpn-header { display: flex; justify-content: space-between; font-size: 0.65rem; margin-bottom: 5px; font-weight: bold; }
+        .vpn-display { background: #000; border: 1px inset #333; padding: 6px; text-align: center; font-size: 0.8rem; margin-bottom: 6px; }
+        .vpn-on { color: var(--matrix-green); } .vpn-off { color: var(--interface-red); }
+        .vpn-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        .vpn-btn { background: #1a1a1a; border: 1px solid #444; color: #fff; padding: 5px; font-size: 0.6rem; cursor: pointer; text-transform: uppercase; }
+
+        .gift-console { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 3px; 
+            padding: 8px; 
+            background: #080808; 
+        }
+        .gift-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 8px; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
+        .gift-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        #gift-alert-overlay { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            z-index: 9999; display: none; pointer-events: none; 
+        }
+        #gift-alert-overlay img { 
+            width: 200px; border: 3px solid var(--matrix-green); 
+            box-shadow: 0 0 40px var(--matrix-green); background: #000; 
+        }
     </style>
 </head>
 <body>
 
 <div id="pin-overlay">
-    <div style="letter-spacing: 5px; color: var(--interface-red); font-weight: bold;">ENCRYPTED_ACCESS_ONLY</div>
+    <div style="letter-spacing: 5px; color: var(--interface-red); font-weight: bold;">NEOXSTEALTH_ENCRYPTION</div>
     <input type="password" id="pin-input" maxlength="4" placeholder="----" autofocus>
-    <div class="pin-warning">virgil je komt er niet makkelijk in!</div>
-    <div id="access-granted">ACCESS GRANTED</div>
+    <div id="pin-error">FOUT! NOG 3 POGINGEN OVER.</div>
+    <div id="access-granted">TOEGANG VERLEEND.</div>
 </div>
 
 <div id="gift-alert-overlay"><img id="gift-alert-img" src=""></div>
@@ -110,102 +133,95 @@
 <div class="app-container" id="app">
     <main><iframe src="https://neoxchat.com" id="neoxchat-frame"></iframe></main>
 
-    <section class="album-section">
-        <div class="album-title">Mooie foto's van Virgil</div>
-        <div class="photo-album">
-            <div class="album-item" onclick="openLightbox('cute.png')"><img src="cute.png"></div>
-            <div class="album-item" onclick="openLightbox('HSH.png')"><img src="HSH.png"></div>
-            <div class="album-item" onclick="openLightbox('huil.png')"><img src="huil.png"></div>
-        </div>
-    </section>
-
     <aside class="sidebar">
-        <div class="status-bar">SECURE_CHANNEL: LIVE <span id="cooldown-timer"></span></div>
-        <div class="stealth-bio">De enige plek waar je Virgil kan zien zonder gezeik!</div>
+        <div class="status-bar">SECURE_NODE_ALPHA <span id="cooldown-timer" style="float:right; color:var(--interface-red);"></span></div>
         
         <div id="chatbro-container"></div>
+        
+        <div class="sidebar-bottom-controls">
+            <div class="sidebar-logo">
+                <img src="logoneo.png" alt="NEOXSTEALTH">
+            </div>
 
-        <div class="gift-console">
-            <button class="gift-btn" onclick="gift('Wiet', 'wiet.png')">WIET</button>
-            <button class="gift-btn" onclick="gift('Bier', 'bier.png')">BIER</button>
-            <button class="gift-btn" onclick="gift('Trudy', 'angel.png')">TRUDY</button>
-            <button class="gift-btn" onclick="gift('Angel', 'angel.png')">ANGEL</button>
-            <button class="gift-btn" onclick="gift('Jill', 'angel.png')">JILL</button>
-            <button class="gift-btn" onclick="gift('Virgil', 'virgil.png')">VIRGIL</button>
-            <button class="gift-btn" onclick="gift('JWA_ARKADE', 'jwarkade.png')">JWA_ARKADE</button>
+            <div class="stealth-bio">
+                <span class="bio-prefix">[INTEL_REPORT]</span>
+                De enige plek waar je Virgil kan zien zonder gezeik!
+            </div>
+
+            <div class="vpn-module">
+                <div class="vpn-header"><span>STEALTH_VPN_v3.0</span><span id="vpn-status-text" class="vpn-on">CONNECTED</span></div>
+                <div id="vpn-ip-display" class="vpn-display vpn-on">104.22.14.98</div>
+                <div class="vpn-controls">
+                    <button class="vpn-btn" onclick="toggleVPN()">Power</button>
+                    <button class="vpn-btn" onclick="randomizeIP()">Randomize</button>
+                </div>
+            </div>
+
+            <div class="gift-console">
+                <button class="gift-btn" onclick="executeGift('wiet.png')">WIET</button>
+                <button class="gift-btn" onclick="executeGift('bier.png')">BIER</button>
+                <button class="gift-btn" onclick="executeGift('trudy.png')">TRUDY</button>
+                <button class="gift-btn" onclick="executeGift('jill.png')">JILL</button>
+                <button class="gift-btn" onclick="executeGift('angel.png')">ANGEL</button>
+                <button class="gift-btn" onclick="executeGift('virgil.png')">VIRGIL</button>
+                <button class="gift-btn" onclick="executeGift('jwarkade.png')">JWA_ARKADE</button>
+            </div>
         </div>
     </aside>
-
-    <section class="logo-container"><img src="logoneo.png" alt="NEOXSTEALTH"></section>
 </div>
 
-<div id="lightbox" onclick="this.style.display='none'"><img id="lbImg" src=""></div>
-
 <script>
-function ChatbroLoader(chats,async){async=!1!==async;var params={embedChatsParameters:chats instanceof Array?chats:[chats],lang:navigator.language||navigator.userLanguage,needLoadCode:'undefined'==typeof Chatbro,embedParamsVersion:localStorage.embedParamsVersion,chatbroScriptVersion:localStorage.chatbroScriptVersion},xhr=new XMLHttpRequest;xhr.withCredentials=!0,xhr.onload=function(){eval(xhr.responseText)},xhr.onerror=function(){console.error('Chatbro loading error')},xhr.open('GET','https://www.chatbro.com/embed.js?'+btoa(unescape(encodeURIComponent(JSON.stringify(params)))),async),xhr.send()}
+function ChatbroLoader(chats,async){async=!1!==async;var params={embedChatsParameters:chats instanceof Array?chats:[chats],lang:navigator.language||navigator.userLanguage,needLoadCode:'undefined'==typeof Chatbro,embedParamsVersion:localStorage.embedParamsVersion,chatbroScriptVersion:localStorage.chatbroScriptVersion},xhr=new XMLHttpRequest;xhr.withCredentials=!0,xhr.onload=function(){eval(xhr.responseText)},xhr.open('GET','https://www.chatbro.com/embed.js?'+btoa(unescape(encodeURIComponent(JSON.stringify(params)))),async),xhr.send()}
 
-function loadChat() {
-    ChatbroLoader({
-        encodedChatId: '69AtT',
-        containerId: 'chatbro-container'
-    });
+const pinInput = document.getElementById('pin-input');
+const pinError = document.getElementById('pin-error');
+const accessText = document.getElementById('access-granted');
+const overlay = document.getElementById('pin-overlay');
+const app = document.getElementById('app');
+let attempts = 3;
+
+pinInput.addEventListener('input', () => {
+    if(pinInput.value.length === 4) {
+        if(pinInput.value === '6967') {
+            pinInput.style.display = 'none'; pinError.style.display = 'none';
+            accessText.style.display = 'block';
+            setTimeout(() => {
+                overlay.style.display = 'none'; app.style.display = 'grid';
+                ChatbroLoader({encodedChatId: '69AtT', containerId: 'chatbro-container'});
+            }, 1200);
+        } else {
+            attempts--; pinInput.value = ''; pinError.style.display = 'block';
+            if(attempts > 0) { pinError.innerText = `FOUT! NOG ${attempts} POGINGEN OVER.`; }
+            else { pinError.innerText = "SYSTEEM VERGRENDELD."; pinInput.disabled = true; }
+        }
+    }
+});
+
+let vpnActive = true;
+function randomizeIP() { if(!vpnActive) return; document.getElementById('vpn-ip-display').innerText = Array.from({length: 4}, () => Math.floor(Math.random() * 256)).join('.'); }
+function toggleVPN() { 
+    vpnActive = !vpnActive; 
+    const d = document.getElementById('vpn-ip-display');
+    const s = document.getElementById('vpn-status-text');
+    if(vpnActive) { s.innerText="CONNECTED"; s.className="vpn-on"; d.className="vpn-display vpn-on"; randomizeIP(); }
+    else { s.innerText="DISCONNECTED"; s.className="vpn-off"; d.className="vpn-display vpn-off"; d.innerText="IP_LEAK_DETECTED"; }
+}
+
+function executeGift(fileName) {
+    const alertOverlay = document.getElementById('gift-alert-overlay');
+    const alertImg = document.getElementById('gift-alert-img');
+    const buttons = document.querySelectorAll('.gift-btn');
+    const cooldownDisplay = document.getElementById('cooldown-timer');
+    alertImg.src = fileName;
+    alertOverlay.style.display = 'block';
+    setTimeout(() => { alertOverlay.style.display = 'none'; }, 2000);
+    buttons.forEach(b => b.disabled = true);
+    let sec = 10;
+    const countdown = setInterval(() => {
+        sec--; cooldownDisplay.innerText = `[RECHARGE: ${sec}s]`;
+        if(sec <= 0) { clearInterval(countdown); cooldownDisplay.innerText = ''; buttons.forEach(b => b.disabled = false); }
+    }, 1000);
 }
 </script>
-
-<script>
-    const pinInput = document.getElementById('pin-input');
-    const accessText = document.getElementById('access-granted');
-    const overlay = document.getElementById('pin-overlay');
-    const app = document.getElementById('app');
-    const cooldownLabel = document.getElementById('cooldown-timer');
-    const giftButtons = document.querySelectorAll('.gift-btn');
-    const giftAlert = document.getElementById('gift-alert-overlay');
-    const giftImg = document.getElementById('gift-alert-img');
-
-    let canGift = true;
-
-    pinInput.addEventListener('input', () => {
-        if(pinInput.value === '6967') {
-            pinInput.style.display = 'none';
-            document.querySelector('.pin-warning').style.display = 'none';
-            accessText.style.display = 'block';
-            
-            setTimeout(() => {
-                overlay.style.display = 'none'; 
-                app.style.display = 'grid';
-                loadChat(); // Laad de chatbro widget pas hier
-            }, 1500);
-        }
-    });
-
-    function gift(name, imgFile) {
-        if(!canGift) return;
-        giftImg.src = imgFile;
-        giftAlert.style.display = 'block';
-        setTimeout(() => { giftAlert.style.display = 'none'; }, 2000);
-        startCooldown();
-    }
-
-    function startCooldown() {
-        canGift = false;
-        let timeLeft = 10;
-        giftButtons.forEach(btn => btn.disabled = true);
-        const timer = setInterval(() => {
-            timeLeft--;
-            cooldownLabel.innerText = `WAIT: ${timeLeft}s`;
-            if(timeLeft <= 0) {
-                clearInterval(timer); canGift = true;
-                cooldownLabel.innerText = "";
-                giftButtons.forEach(btn => btn.disabled = false);
-            }
-        }, 1000);
-    }
-
-    function openLightbox(src) {
-        document.getElementById('lbImg').src = src;
-        document.getElementById('lightbox').style.display = 'flex';
-    }
-</script>
-
 </body>
 </html>
