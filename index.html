@@ -2,227 +2,219 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>NEOXSTEALTH | Full Access</title>
+    <title>NEOXSTEALTH | Security Protocol v6.2</title>
     <style>
         :root {
             --bg: #020202;
             --matrix-green: #00ff41;
             --interface-red: #ff003c;
             --panel-bg: #0a0a0a;
-            --text-dim: #888;
         }
 
-        body {
-            margin: 0;
+        body, html {
+            margin: 0; padding: 0;
             font-family: 'Consolas', 'Courier New', monospace;
             background: var(--bg);
             color: var(--matrix-green);
-            display: grid;
-            grid-template-columns: 1fr 400px; /* Bredere zijbalk voor bio + chat */
-            height: 100vh;
+            height: 100vh; width: 100vw;
             overflow: hidden;
         }
 
-        /* --- Hoofdsectie (Links) --- */
-        main {
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid #222;
-            height: 100vh;
+        /* --- Pincode Overlay --- */
+        #pin-overlay {
+            position: fixed; inset: 0;
+            background: #000; z-index: 10000;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+        }
+        #pin-input {
+            background: transparent; border: 1px solid var(--matrix-green);
+            color: var(--matrix-green); font-size: 2.5rem; text-align: center;
+            padding: 10px; width: 180px; outline: none; margin-top: 20px;
+            letter-spacing: 8px;
+        }
+        .pin-warning { color: #fff; font-size: 1.1rem; margin-top: 15px; font-weight: bold; text-transform: uppercase; }
+        #access-granted { color: var(--matrix-green); font-size: 2rem; font-weight: bold; display: none; margin-top: 20px; text-shadow: 0 0 10px var(--matrix-green); }
+
+        /* --- Main Layout --- */
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            grid-template-rows: 1fr 240px;
+            height: 100vh; width: 100vw;
+            display: none; 
         }
 
-        .web-frame {
-            flex-grow: 1; /* Neemt nu bijna alle verticale ruimte in */
-            background: #000;
-            border: none;
-        }
+        /* --- Frame Sectie --- */
+        main { grid-column: 1; grid-row: 1; background: #000; position: relative; border-right: 1px solid #222; }
+        iframe#neoxchat-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            filter: contrast(1.1);
+        /* --- Gift Pop-up (Midden op scherm) --- */
+        #gift-alert-overlay {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9000;
+            pointer-events: none;
+            display: none;
         }
-
-        /* --- Fotoalbum (Onderaan Main) --- */
-        .photo-album {
-            height: 130px;
-            background: #080808;
-            border-top: 2px solid var(--matrix-green);
-            padding: 10px;
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            align-items: center;
+        #gift-alert-overlay img {
+            width: 150px; /* Klein formaat zoals gevraagd */
+            border: 2px solid var(--matrix-green);
+            box-shadow: 0 0 20px var(--matrix-green);
+            animation: popIn 0.5s ease-out;
         }
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.2); } 100% { transform: scale(1); opacity: 1; } }
 
-        .album-item {
-            flex: 0 0 110px;
-            height: 100px;
-            border: 1px solid #333;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .album-item:hover { border-color: var(--matrix-green); transform: scale(1.05); }
+        /* --- Fotoalbum --- */
+        .album-section { grid-column: 1; grid-row: 2; background: #080808; border-top: 2px solid var(--matrix-green); display: flex; flex-direction: column; padding: 10px; overflow: hidden; }
+        .album-title { font-size: 1rem; color: #fff; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #333; }
+        .photo-album { display: flex; gap: 10px; overflow-x: auto; align-items: center; flex-grow: 1; }
+        .album-item { flex: 0 0 160px; height: 160px; border: 1px solid #333; cursor: pointer; }
         .album-item img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- Zijpaneel (Rechts) --- */
-        .sidebar {
-            background: var(--panel-bg);
-            display: flex;
-            flex-direction: column;
-            border-left: 1px solid #222;
-        }
-
-        .status-bar {
-            background: #111;
-            padding: 10px;
-            border-bottom: 1px solid #222;
-        }
-
-        .name-editor {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            margin-bottom: 5px;
-        }
-
-        #agentNameInput {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: var(--matrix-green);
-            padding: 5px;
-            font-family: inherit;
-            outline: none;
-            width: 60%;
-        }
-
-        .stealth-bio {
-            padding: 10px;
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            border-bottom: 1px solid #222;
-            line-height: 1.3;
-        }
-
-        #chat-window {
-            flex-grow: 1;
-            padding: 15px;
-            overflow-y: auto;
-            font-size: 0.8rem;
-            background: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)), url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
-        }
-
+        /* --- Zijpaneel --- */
+        .sidebar { grid-column: 2; grid-row: 1; background: var(--panel-bg); display: flex; flex-direction: column; border-left: 1px solid #222; }
+        .status-bar { background: #111; padding: 10px; border-bottom: 1px solid #222; font-size: 0.7rem; }
+        #agentNameInput { background: #1a1a1a; border: 1px solid #333; color: var(--matrix-green); padding: 4px; font-family: inherit; width: 120px; outline: none; }
+        .stealth-bio { padding: 10px; font-size: 0.8rem; color: #eee; border-bottom: 1px solid #222; }
+        #chat-window { flex-grow: 1; padding: 10px; overflow-y: auto; font-size: 0.8rem; background: #050505; }
         .msg { margin-bottom: 8px; border-left: 2px solid #333; padding-left: 8px; }
-        .msg.agent .user-name { color: var(--matrix-green); font-weight: bold; }
-        
-        /* Gifts */
-        .gift-console {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 4px;
-            padding: 10px;
-            background: #080808;
-        }
 
-        .gift-btn {
-            background: #111;
-            border: 1px solid #333;
-            color: #888;
-            padding: 6px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            font-family: inherit;
-        }
+        /* --- Gift Console & Cooldown --- */
+        .gift-console { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 10px; background: #080808; }
+        .gift-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 6px; font-size: 0.7rem; cursor: pointer; transition: 0.3s; }
+        .gift-btn:disabled { color: #444; border-color: #222; cursor: not-allowed; }
+        #cooldown-timer { color: var(--interface-red); font-weight: bold; font-size: 0.7rem; margin-left: 5px; display: none; }
 
-        .gift-btn:hover { color: var(--matrix-green); border-color: var(--matrix-green); }
+        .input-wrap { padding: 10px; background: #000; border-top: 1px solid #222; }
+        #stealthInput { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--matrix-green); color: var(--matrix-green); outline: none; }
 
-        .input-wrap { padding: 15px; background: #000; }
-        input#stealthInput { width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--matrix-green); color: var(--matrix-green); outline: none; padding: 5px; }
+        /* --- Logo Sectie --- */
+        .logo-container { grid-column: 2; grid-row: 2; background: #000; border-left: 1px solid #222; border-top: 2px solid var(--matrix-green); display: flex; justify-content: center; align-items: center; padding: 10px; }
+        .logo-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* Lightbox */
-        #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; cursor: pointer; }
-        #lightbox img { max-width: 85%; max-height: 85%; border: 2px solid var(--matrix-green); }
+        #lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; }
+        #lightbox img { max-width: 80%; max-height: 80%; border: 2px solid var(--matrix-green); }
     </style>
 </head>
 <body>
 
-<main>
-    <div class="web-frame">
-        <iframe src="https://neoxchat.com"></iframe>
-    </div>
-
-    <section class="photo-album">
-        <div class="album-item" onclick="openLightbox('cute.png')">
-            <img src="cute.png" alt="Cute">
-        </div>
-        <div class="album-item" onclick="openLightbox('HSH.png')">
-            <img src="HSH.png" alt="HSH">
-        </div>
-        <div class="album-item" onclick="openLightbox('huil.png')">
-            <img src="huil.png" alt="Huil">
-        </div>
-    </section>
-</main>
-
-<aside class="sidebar">
-    <div class="status-bar">
-        <div class="name-editor">
-            <label>AGENT_ID:</label>
-            <input type="text" id="agentNameInput" value="NEOX_GHOST" maxlength="15">
-        </div>
-        <div style="font-size: 0.65rem; color: var(--interface-red);">SYSTEM_STATUS: STEALTH_ACTIVE</div>
-    </div>
-
-    <div class="stealth-bio">
-        <b>PROTOCOL: NEOXSTEALTH</b><br>
-        Ingebroken op Neoxchat. Identiteit verborgen. Geen gezichten, alleen data. 
-        Gifts worden direct naar de buffer gestuurd.
-    </div>
-
-    <div id="chat-window"></div>
-
-    <div class="gift-console">
-        <button class="gift-btn" onclick="gift('Wiet')">WIET</button>
-        <button class="gift-btn" onclick="gift('Bier')">BIER</button>
-        <button class="gift-btn" onclick="gift('Trudy')">TRUDY</button>
-        <button class="gift-btn" onclick="gift('Angel')">ANGEL</button>
-        <button class="gift-btn" onclick="gift('Jill')">JILL</button>
-        <button class="gift-btn" onclick="gift('Virgil')">VIRGIL</button>
-        <button class="gift-btn" onclick="gift('Johanwagenaararkade')">JWA_ARKADE</button>
-    </div>
-
-    <div class="input-wrap">
-        <input type="text" id="stealthInput" placeholder="> Typ bericht..." autocomplete="off">
-    </div>
-</aside>
-
-<div id="lightbox" onclick="this.style.display='none'">
-    <img id="lbImg" src="">
+<div id="pin-overlay">
+    <div style="letter-spacing: 5px; color: var(--interface-red); font-weight: bold;">ENCRYPTED_ACCESS_ONLY</div>
+    <input type="password" id="pin-input" maxlength="4" placeholder="----" autofocus>
+    <div class="pin-warning">virgil je komt er niet makkelijk in!</div>
+    <div id="access-granted">ACCESS GRANTED</div>
 </div>
 
+<div id="gift-alert-overlay">
+    <img id="gift-alert-img" src="" alt="Gift Alert">
+</div>
+
+<div class="app-container" id="app">
+    <main><iframe src="https://neoxchat.com" id="neoxchat-frame"></iframe></main>
+
+    <section class="album-section">
+        <div class="album-title">Mooie foto's van Virgil</div>
+        <div class="photo-album">
+            <div class="album-item" onclick="openLightbox('cute.png')"><img src="cute.png"></div>
+            <div class="album-item" onclick="openLightbox('HSH.png')"><img src="HSH.png"></div>
+            <div class="album-item" onclick="openLightbox('huil.png')"><img src="huil.png"></div>
+        </div>
+    </section>
+
+    <aside class="sidebar">
+        <div class="status-bar">
+            AGENT_ID: <input type="text" id="agentNameInput" value="NEOX_GHOST">
+            <span id="cooldown-timer">WAIT: 10s</span>
+        </div>
+        <div class="stealth-bio">De enige plek waar je Virgil kan zien zonder gezeik!</div>
+        <div id="chat-window"></div>
+        <div class="gift-console">
+            <button class="gift-btn" onclick="gift('Wiet', 'wiet.png')">WIET</button>
+            <button class="gift-btn" onclick="gift('Bier', 'bier.png')">BIER</button>
+            <button class="gift-btn" onclick="gift('Trudy', 'angel.png')">TRUDY</button>
+            <button class="gift-btn" onclick="gift('Angel', 'angel.png')">ANGEL</button>
+            <button class="gift-btn" onclick="gift('Jill', 'angel.png')">JILL</button>
+            <button class="gift-btn" onclick="gift('Virgil', 'virgil.png')">VIRGIL</button>
+            <button class="gift-btn" onclick="gift('JWA_ARKADE', 'jwarkade.png')">JWA_ARKADE</button>
+        </div>
+        <div class="input-wrap"><input type="text" id="stealthInput" placeholder="> Typ..." autocomplete="off"></div>
+    </aside>
+
+    <section class="logo-container"><img src="logoneo.png" alt="NEOXSTEALTH"></section>
+</div>
+
+<div id="lightbox" onclick="this.style.display='none'"><img id="lbImg" src=""></div>
+
 <script>
+    const pinInput = document.getElementById('pin-input');
+    const overlay = document.getElementById('pin-overlay');
+    const app = document.getElementById('app');
     const chat = document.getElementById('chat-window');
     const input = document.getElementById('stealthInput');
     const nameIn = document.getElementById('agentNameInput');
+    const cooldownLabel = document.getElementById('cooldown-timer');
+    const giftButtons = document.querySelectorAll('.gift-btn');
+    const giftAlert = document.getElementById('gift-alert-overlay');
+    const giftImg = document.getElementById('gift-alert-img');
 
-    function log(user, text, type='') {
+    let canGift = true;
+
+    // PIN LOGICA (6967)
+    pinInput.addEventListener('input', () => {
+        if(pinInput.value === '6967') {
+            document.getElementById('access-granted').style.display = 'block';
+            setTimeout(() => { overlay.style.display = 'none'; app.style.display = 'grid'; log('SYSTEM', 'Protocol 6.2 ONLINE.'); }, 1200);
+        }
+    });
+
+    function log(user, text) {
         const d = document.createElement('div');
-        d.className = `msg ${type}`;
-        d.innerHTML = `<span class="user-name">${user}:</span> ${text}`;
+        d.className = `msg`;
+        d.innerHTML = `<span style="font-weight:bold; color:var(--matrix-green);">${user}:</span> ${text}`;
         chat.appendChild(d);
-        chat.scrollTop = chat.scrollHeight;
+        chat.scrollTop = chat.scrollHeight; 
     }
 
-    function gift(n) { log(nameIn.value, `GIFT_INJECTED: [${n}]`, 'agent'); }
+    function gift(name, imgFile) {
+        if(!canGift) return;
+
+        // 1. Log in chat
+        log(nameIn.value, `GIFT_INJECTED: [${name}]`);
+
+        // 2. Toon afbeelding in het midden
+        giftImg.src = imgFile;
+        giftAlert.style.display = 'block';
+        setTimeout(() => { giftAlert.style.display = 'none'; }, 2000); // 2 sec zichtbaar
+
+        // 3. Cooldown starten
+        startCooldown();
+    }
+
+    function startCooldown() {
+        canGift = false;
+        let timeLeft = 10;
+        cooldownLabel.style.display = 'inline';
+        giftButtons.forEach(btn => btn.disabled = true);
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            cooldownLabel.innerText = `WAIT: ${timeLeft}s`;
+            if(timeLeft <= 0) {
+                clearInterval(timer);
+                canGift = true;
+                cooldownLabel.style.display = 'none';
+                giftButtons.forEach(btn => btn.disabled = false);
+            }
+        }, 1000);
+    }
 
     input.addEventListener('keypress', (e) => {
         if(e.key === 'Enter' && input.value !== "") {
-            log(nameIn.value, input.value, 'agent');
+            log(nameIn.value, input.value);
             input.value = "";
-            setTimeout(() => log('NEOX-BOT', 'Bericht gecodeerd verzonden.'), 600);
         }
     });
 
@@ -230,9 +222,6 @@
         document.getElementById('lbImg').src = src;
         document.getElementById('lightbox').style.display = 'flex';
     }
-
-    // Welkomstbericht
-    window.onload = () => log('SYSTEM', 'Verbinding met Neoxchat stabiel.');
 </script>
 
 </body>
