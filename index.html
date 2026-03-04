@@ -1,14 +1,15 @@
-neo<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>NEOXSTEALTH</title>
+    <title>NEOXSTEALTH | Food Update v8.2</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
         :root {
             --bg: #020202;
             --matrix-green: #00ff41;
             --interface-red: #ff003c;
+            --thuisbezorgd-orange: #ff8000; /* De officiële oranje kleur */
             --panel-bg: #0a0a0a;
             --radius: 2px;
         }
@@ -47,43 +48,56 @@ neo<!DOCTYPE html>
         main { grid-column: 1; background: #000; position: relative; border-right: 1px solid #222; height: 100vh; }
         iframe#neoxchat-frame { width: 100%; height: 100%; border: none; }
 
-        /* Rechts: Sidebar Fixed Layout */
+        /* Rechts: Sidebar */
         .sidebar { 
             grid-column: 2; 
             background: var(--panel-bg); 
             display: flex; 
             flex-direction: column; 
             border-left: 1px solid #222; 
-            height: 100vh; /* Vul de hele hoogte */
+            height: 100vh;
         }
         
         .status-bar { background: #111; padding: 8px; font-size: 0.7rem; border-bottom: 1px solid #222; color: #fff; flex-shrink: 0; }
         
-        /* Chatbro neemt alle beschikbare ruimte in */
-        #chatbro-container { 
-            flex: 1; 
-            background: #000; 
-            overflow: hidden; 
+        #chatbro-container { flex: 1; background: #000; overflow: hidden; }
+
+        .sidebar-bottom-controls { flex-shrink: 0; background: #000; border-top: 2px solid #222; }
+
+        /* --- NIEUWE VOEDSEL KNOP --- */
+        .food-button-container {
+            padding: 15px;
+            text-align: center;
+            background: #050505;
+        }
+        .food-btn {
+            background: var(--thuisbezorgd-orange);
+            border: none;
+            color: #fff;
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border-radius: var(--radius);
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .food-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px var(--thuisbezorgd-orange);
+        }
+        .food-btn img {
+            height: 25px;
+            width: auto;
         }
 
-        /* De onderste sectie (Logo, Bio, VPN, Gifts) */
-        .sidebar-bottom-controls {
-            flex-shrink: 0; /* Zorgt dat dit niet kleiner wordt */
-            background: #000;
-        }
-
-        .sidebar-logo { 
-            padding: 15px 10px; 
-            text-align: center; 
-            border-top: 2px solid #222; 
-        }
-        .sidebar-logo img { 
-            width: 85%; 
-            height: auto; 
-            max-height: 120px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 5px var(--matrix-green));
-        }
+        .sidebar-logo { padding: 10px; text-align: center; }
+        .sidebar-logo img { width: 80%; height: auto; max-height: 100px; object-fit: contain; filter: drop-shadow(0 0 5px var(--matrix-green)); }
 
         .stealth-bio {
             background: #0a0a0a; color: #fff; font-size: 0.7rem; padding: 8px;
@@ -99,24 +113,12 @@ neo<!DOCTYPE html>
         .vpn-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
         .vpn-btn { background: #1a1a1a; border: 1px solid #444; color: #fff; padding: 5px; font-size: 0.6rem; cursor: pointer; text-transform: uppercase; }
 
-        .gift-console { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 3px; 
-            padding: 8px; 
-            background: #080808; 
-        }
+        .gift-console { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 8px; background: #080808; }
         .gift-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 8px; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
         .gift-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        #gift-alert-overlay { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            z-index: 9999; display: none; pointer-events: none; 
-        }
-        #gift-alert-overlay img { 
-            width: 200px; border: 3px solid var(--matrix-green); 
-            box-shadow: 0 0 40px var(--matrix-green); background: #000; 
-        }
+        #gift-alert-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; display: none; pointer-events: none; }
+        #gift-alert-overlay img { width: 200px; border: 3px solid var(--matrix-green); box-shadow: 0 0 40px var(--matrix-green); background: #000; }
     </style>
 </head>
 <body>
@@ -135,10 +137,15 @@ neo<!DOCTYPE html>
 
     <aside class="sidebar">
         <div class="status-bar">SECURE_NODE_ALPHA <span id="cooldown-timer" style="float:right; color:var(--interface-red);"></span></div>
-        
         <div id="chatbro-container"></div>
         
         <div class="sidebar-bottom-controls">
+            <div class="food-button-container">
+                <button class="food-btn" onclick="window.open('https://www.thuisbezorgd.nl', '_blank')">
+                    <img src="eten.png" alt=""> BESTEL ETEN VOOR VIRGIL
+                </button>
+            </div>
+
             <div class="sidebar-logo">
                 <img src="logoneo.png" alt="NEOXSTEALTH">
             </div>
@@ -149,7 +156,7 @@ neo<!DOCTYPE html>
             </div>
 
             <div class="vpn-module">
-                <div class="vpn-header"><span>STEALTH_VPN_v3.0</span><span id="vpn-status-text" class="vpn-on">CONNECTED</span></div>
+                <div class="vpn-header"><span>STEALTH_VPN_v3.2</span><span id="vpn-status-text" class="vpn-on">CONNECTED</span></div>
                 <div id="vpn-ip-display" class="vpn-display vpn-on">104.22.14.98</div>
                 <div class="vpn-controls">
                     <button class="vpn-btn" onclick="toggleVPN()">Power</button>
@@ -171,6 +178,7 @@ neo<!DOCTYPE html>
 </div>
 
 <script>
+// Chatbro Loader
 function ChatbroLoader(chats,async){async=!1!==async;var params={embedChatsParameters:chats instanceof Array?chats:[chats],lang:navigator.language||navigator.userLanguage,needLoadCode:'undefined'==typeof Chatbro,embedParamsVersion:localStorage.embedParamsVersion,chatbroScriptVersion:localStorage.chatbroScriptVersion},xhr=new XMLHttpRequest;xhr.withCredentials=!0,xhr.onload=function(){eval(xhr.responseText)},xhr.open('GET','https://www.chatbro.com/embed.js?'+btoa(unescape(encodeURIComponent(JSON.stringify(params)))),async),xhr.send()}
 
 const pinInput = document.getElementById('pin-input');
