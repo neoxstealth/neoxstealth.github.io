@@ -2,16 +2,17 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>NEOXSTEALTH</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEOXSTEALTH | MISSION_ACCOMPLISHED</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
         :root {
-            --bg: #020202;
+            --bg: #000000;
             --matrix-green: #00ff41;
-            --interface-red: #ff003c;
-            --thuisbezorgd-orange: #ff8000; /* De officiële oranje kleur */
+            --dark-green: #003300;
+            --grab-green: #00b14f; /* De officiële Grab kleur */
             --panel-bg: #0a0a0a;
-            --radius: 2px;
+            --radius: 4px;
         }
 
         body, html {
@@ -20,216 +21,156 @@
             background: var(--bg);
             color: var(--matrix-green);
             height: 100vh; width: 100vw;
-            overflow: hidden;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* --- Pincode Overlay --- */
-        #pin-overlay {
-            position: fixed; inset: 0; background: #000; z-index: 10000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        #pin-input {
-            background: transparent; border: 1px solid var(--matrix-green);
-            color: var(--matrix-green); font-size: 2.5rem; text-align: center;
-            padding: 10px; width: 180px; outline: none; margin-top: 20px;
-            letter-spacing: 8px; border-radius: var(--radius);
-        }
-        #pin-error { color: var(--interface-red); margin-top: 10px; font-weight: bold; display: none; }
-        #access-granted { color: var(--matrix-green); font-size: 1.5rem; font-weight: bold; display: none; margin-top: 20px; }
-
-        /* --- Main Layout --- */
-        .app-container {
-            display: grid;
-            grid-template-columns: 1fr 350px;
-            height: 100vh; width: 100vw;
-            display: none; 
+        #matrix-bg {
+            position: fixed; inset: 0;
+            z-index: 1;
+            opacity: 0.15;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,255,65,0.1) 50%, rgba(0,0,0,0) 100%);
         }
 
-        main { grid-column: 1; background: #000; position: relative; border-right: 1px solid #222; height: 100vh; }
-        iframe#neoxchat-frame { width: 100%; height: 100%; border: none; }
-
-        /* Rechts: Sidebar */
-        .sidebar { 
-            grid-column: 2; 
-            background: var(--panel-bg); 
-            display: flex; 
-            flex-direction: column; 
-            border-left: 1px solid #222; 
-            height: 100vh;
-        }
-        
-        .status-bar { background: #111; padding: 8px; font-size: 0.7rem; border-bottom: 1px solid #222; color: #fff; flex-shrink: 0; }
-        
-        #chatbro-container { flex: 1; background: #000; overflow: hidden; }
-
-        .sidebar-bottom-controls { flex-shrink: 0; background: #000; border-top: 2px solid #222; }
-
-        /* --- NIEUWE VOEDSEL KNOP --- */
-        .food-button-container {
-            padding: 15px;
+        .victory-panel {
+            position: relative;
+            z-index: 10;
+            width: 90%; max-width: 600px;
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid var(--matrix-green);
+            border-radius: var(--radius);
+            padding: 30px;
             text-align: center;
-            background: #050505;
+            box-shadow: 0 0 40px rgba(0, 255, 65, 0.2);
+            box-sizing: border-box;
         }
-        .food-btn {
-            background: var(--thuisbezorgd-orange);
-            border: none;
+
+        .victory-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
             color: #fff;
-            padding: 12px;
+            text-shadow: 0 0 10px var(--matrix-green);
+            margin-bottom: 20px;
+        }
+
+        .victory-message {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: var(--matrix-green);
+        }
+
+        .highlight {
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 0 0 5px var(--matrix-green);
+        }
+
+        /* Ticker Tape */
+        .ticker-wrap {
+            width: 100%; overflow: hidden;
+            background-color: rgba(0, 255, 65, 0.05);
+            padding: 10px 0;
+            border-top: 1px solid var(--dark-green);
+            border-bottom: 1px solid #222;
+            margin-bottom: 30px;
+        }
+        .ticker {
+            display: inline-block; white-space: nowrap;
+            animation: ticker 20s linear infinite;
+        }
+        .ticker-item { display: inline-block; padding: 0 20px; font-size: 0.8rem; color: var(--matrix-green); }
+
+        /* GRABFOOD KNOP */
+        .grab-button-container {
+            margin-bottom: 25px;
+        }
+        .grab-btn {
+            background: var(--grab-green);
+            border: none;
+            color: white;
+            padding: 15px 25px;
             width: 100%;
             cursor: pointer;
             font-weight: bold;
+            text-transform: uppercase;
             font-size: 1rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
             border-radius: var(--radius);
-            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 177, 79, 0.3);
             transition: 0.3s;
         }
-        .food-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 15px var(--thuisbezorgd-orange);
-        }
-        .food-btn img {
+        .grab-btn img {
             height: 25px;
             width: auto;
         }
-
-        .sidebar-logo { padding: 10px; text-align: center; }
-        .sidebar-logo img { width: 80%; height: auto; max-height: 100px; object-fit: contain; filter: drop-shadow(0 0 5px var(--matrix-green)); }
-
-        .stealth-bio {
-            background: #0a0a0a; color: #fff; font-size: 0.7rem; padding: 8px;
-            text-align: center; border-top: 1px solid #222; border-bottom: 1px solid #222;
-            font-style: italic; text-transform: uppercase;
+        .grab-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 177, 79, 0.5);
         }
-        .bio-prefix { color: var(--matrix-green); font-weight: bold; font-size: 0.6rem; display: block; }
+        .grab-btn:active { transform: translateY(0); }
 
-        .vpn-module { background: #0d0d0d; padding: 10px; border-bottom: 1px solid #222; }
-        .vpn-header { display: flex; justify-content: space-between; font-size: 0.65rem; margin-bottom: 5px; font-weight: bold; }
-        .vpn-display { background: #000; border: 1px inset #333; padding: 6px; text-align: center; font-size: 0.8rem; margin-bottom: 6px; }
-        .vpn-on { color: var(--matrix-green); } .vpn-off { color: var(--interface-red); }
-        .vpn-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-        .vpn-btn { background: #1a1a1a; border: 1px solid #444; color: #fff; padding: 5px; font-size: 0.6rem; cursor: pointer; text-transform: uppercase; }
+        .victory-footer {
+            font-size: 0.75rem;
+            color: #555;
+            border-top: 1px solid #222;
+            padding-top: 15px;
+            letter-spacing: 1px;
+        }
 
-        .gift-console { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 8px; background: #080808; }
-        .gift-btn { background: #111; border: 1px solid #333; color: #aaa; padding: 8px; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
-        .gift-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
 
-        #gift-alert-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; display: none; pointer-events: none; }
-        #gift-alert-overlay img { width: 200px; border: 3px solid var(--matrix-green); box-shadow: 0 0 40px var(--matrix-green); background: #000; }
+        @media (max-width: 600px) {
+            .victory-title { font-size: 1.4rem; }
+            .victory-panel { padding: 20px; }
+            .grab-btn { font-size: 0.9rem; }
+        }
     </style>
 </head>
 <body>
 
-<div id="pin-overlay">
-    <div style="letter-spacing: 5px; color: var(--interface-red); font-weight: bold;">NEOXSTEALTH_ENCRYPTION</div>
-    <input type="password" id="pin-input" maxlength="4" placeholder="----" autofocus>
-    <div id="pin-error">FOUT! NOG 3 POGINGEN OVER.</div>
-    <div id="access-granted">TOEGANG VERLEEND.</div>
-</div>
+<div id="matrix-bg"></div>
 
-<div id="gift-alert-overlay"><img id="gift-alert-img" src=""></div>
+<div class="victory-panel">
+    <div class="victory-title">[ MISSION_ACCOMPLISHED ]</div>
+    
+    <div class="victory-message">
+        Systeembevestiging ontvangen.<br>
+        De operatie is geslaagd.<br><br>
+        <span class="highlight">NEOXCHAT.COM IS EINDELIJK WEG.</span><br><br>
+        Tijd om te eten. De buit is binnen.
+    </div>
 
-<div class="app-container" id="app">
-    <main><iframe src="https://neoxchat.com" id="neoxchat-frame"></iframe></main>
-
-    <aside class="sidebar">
-        <div class="status-bar">SECURE_NODE_ALPHA <span id="cooldown-timer" style="float:right; color:var(--interface-red);"></span></div>
-        <div id="chatbro-container"></div>
-        
-        <div class="sidebar-bottom-controls">
-            <div class="food-button-container">
-                <button class="food-btn" onclick="window.open('https://www.thuisbezorgd.nl', '_blank')">
-                    <img src="eten.png" alt=""> BESTEL ETEN VOOR VIRGIL
-                </button>
-            </div>
-
-            <div class="sidebar-logo">
-                <img src="logoneo.png" alt="NEOXSTEALTH">
-            </div>
-
-            <div class="stealth-bio">
-                <span class="bio-prefix">[INTEL_REPORT]</span>
-                De enige plek waar je Virgil kan zien zonder gezeik!
-            </div>
-
-            <div class="vpn-module">
-                <div class="vpn-header"><span>STEALTH_VPN_v3.2</span><span id="vpn-status-text" class="vpn-on">CONNECTED</span></div>
-                <div id="vpn-ip-display" class="vpn-display vpn-on">104.22.14.98</div>
-                <div class="vpn-controls">
-                    <button class="vpn-btn" onclick="toggleVPN()">Power</button>
-                    <button class="vpn-btn" onclick="randomizeIP()">Randomize</button>
-                </div>
-            </div>
-
-            <div class="gift-console">
-                <button class="gift-btn" onclick="executeGift('wiet.png')">WIET</button>
-                <button class="gift-btn" onclick="executeGift('bier.png')">BIER</button>
-                <button class="gift-btn" onclick="executeGift('trudy.png')">TRUDY</button>
-                <button class="gift-btn" onclick="executeGift('jill.png')">JILL</button>
-                <button class="gift-btn" onclick="executeGift('angel.png')">ANGEL</button>
-                <button class="gift-btn" onclick="executeGift('virgil.png')">VIRGIL</button>
-                <button class="gift-btn" onclick="executeGift('jwarkade.png')">JWA_ARKADE</button>
-            </div>
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <span class="ticker-item">>>> TARGET_NEUTRALIZED <<<</span>
+            <span class="ticker-item">SERVER_OFFLINE: neoxchat.com</span>
+            <span class="ticker-item">CLEANUP_PROTOCOL: active</span>
+            <span class="ticker-item">>>> WE_HAVE_WON <<<</span>
+            <span class="ticker-item">VIRGIL_TRACE: zero</span>
         </div>
-    </aside>
+    </div>
+
+    <div class="grab-button-container">
+        <button class="grab-btn" onclick="window.open('https://www.grab.com/food/', '_blank')">
+            <img src="grabfood.png" alt="Grab"> BESTEL OVERWINNINGS VOER
+        </button>
+    </div>
+
+    <div class="victory-footer">
+        NEOXSTEALTH SECURE_NODE // VERIFIED BY: SJAAKIE MITCHEL
+    </div>
 </div>
 
-<script>
-// Chatbro Loader
-function ChatbroLoader(chats,async){async=!1!==async;var params={embedChatsParameters:chats instanceof Array?chats:[chats],lang:navigator.language||navigator.userLanguage,needLoadCode:'undefined'==typeof Chatbro,embedParamsVersion:localStorage.embedParamsVersion,chatbroScriptVersion:localStorage.chatbroScriptVersion},xhr=new XMLHttpRequest;xhr.withCredentials=!0,xhr.onload=function(){eval(xhr.responseText)},xhr.open('GET','https://www.chatbro.com/embed.js?'+btoa(unescape(encodeURIComponent(JSON.stringify(params)))),async),xhr.send()}
-
-const pinInput = document.getElementById('pin-input');
-const pinError = document.getElementById('pin-error');
-const accessText = document.getElementById('access-granted');
-const overlay = document.getElementById('pin-overlay');
-const app = document.getElementById('app');
-let attempts = 3;
-
-pinInput.addEventListener('input', () => {
-    if(pinInput.value.length === 4) {
-        if(pinInput.value === '6967') {
-            pinInput.style.display = 'none'; pinError.style.display = 'none';
-            accessText.style.display = 'block';
-            setTimeout(() => {
-                overlay.style.display = 'none'; app.style.display = 'grid';
-                ChatbroLoader({encodedChatId: '69AtT', containerId: 'chatbro-container'});
-            }, 1200);
-        } else {
-            attempts--; pinInput.value = ''; pinError.style.display = 'block';
-            if(attempts > 0) { pinError.innerText = `FOUT! NOG ${attempts} POGINGEN OVER.`; }
-            else { pinError.innerText = "SYSTEEM VERGRENDELD."; pinInput.disabled = true; }
-        }
-    }
-});
-
-let vpnActive = true;
-function randomizeIP() { if(!vpnActive) return; document.getElementById('vpn-ip-display').innerText = Array.from({length: 4}, () => Math.floor(Math.random() * 256)).join('.'); }
-function toggleVPN() { 
-    vpnActive = !vpnActive; 
-    const d = document.getElementById('vpn-ip-display');
-    const s = document.getElementById('vpn-status-text');
-    if(vpnActive) { s.innerText="CONNECTED"; s.className="vpn-on"; d.className="vpn-display vpn-on"; randomizeIP(); }
-    else { s.innerText="DISCONNECTED"; s.className="vpn-off"; d.className="vpn-display vpn-off"; d.innerText="IP_LEAK_DETECTED"; }
-}
-
-function executeGift(fileName) {
-    const alertOverlay = document.getElementById('gift-alert-overlay');
-    const alertImg = document.getElementById('gift-alert-img');
-    const buttons = document.querySelectorAll('.gift-btn');
-    const cooldownDisplay = document.getElementById('cooldown-timer');
-    alertImg.src = fileName;
-    alertOverlay.style.display = 'block';
-    setTimeout(() => { alertOverlay.style.display = 'none'; }, 2000);
-    buttons.forEach(b => b.disabled = true);
-    let sec = 10;
-    const countdown = setInterval(() => {
-        sec--; cooldownDisplay.innerText = `[RECHARGE: ${sec}s]`;
-        if(sec <= 0) { clearInterval(countdown); cooldownDisplay.innerText = ''; buttons.forEach(b => b.disabled = false); }
-    }, 1000);
-}
-</script>
 </body>
 </html>
