@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeoXStealth</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png">
+    <title>NeoxStealth - iOS Edition</title>
     <style>
         :root {
             --weed-dark: #0a120b;
@@ -18,7 +16,6 @@
             --text-main: #f0f7f0;
             --text-sub: #a3c2a5;
             --red-alert: #ff453a;
-            --thuisbezorgd-orange: #FF8000;
         }
 
         * {
@@ -32,19 +29,13 @@
         body {
             background-color: var(--weed-dark);
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(46, 125, 50, 0.2) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(76, 175, 80, 0.15) 0%, transparent 40%);
+                radial-gradient(circle at 10% 20%, rgba(46, 125, 50, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(76, 175, 80, 0.1) 0%, transparent 40%);
             color: var(--text-main);
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.99); }
-            to { opacity: 1; transform: scale(1); }
         }
 
         /* iOS Frosted Glass Top Bar */
@@ -58,12 +49,6 @@
             align-items: center;
             justify-content: space-between;
             z-index: 10;
-            animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(0); }
         }
 
         .brand {
@@ -74,11 +59,6 @@
             align-items: center;
             gap: 8px;
             letter-spacing: -0.5px;
-            transition: transform 0.3s ease;
-        }
-
-        .brand:hover {
-            transform: scale(1.05);
         }
 
         .url-pill {
@@ -91,12 +71,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .url-pill:hover {
-            border-color: var(--weed-accent);
-            box-shadow: 0 0 10px rgba(129, 199, 132, 0.2);
         }
 
         /* Target Frame Area */
@@ -113,7 +87,7 @@
             border: none;
         }
 
-        /* iOS Alert Overlay met Pop Animaties */
+        /* iOS Alert Overlay */
         .virgil-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -125,7 +99,6 @@
             align-items: center;
             z-index: 99;
             padding: 20px;
-            animation: fadeIn 0.3s ease;
         }
 
         .ios-alert {
@@ -137,12 +110,6 @@
             padding: 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes popUp {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
         }
 
         .ios-alert h3 {
@@ -168,16 +135,11 @@
             font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
-        }
-
-        .ios-btn:hover {
-            background-color: var(--weed-light);
-            transform: translateY(-2px);
+            transition: opacity 0.2s;
         }
 
         .ios-btn:active {
-            transform: translateY(0) scale(0.98);
+            opacity: 0.7;
         }
 
         /* iOS Bottom Sheet Control Center */
@@ -188,15 +150,9 @@
             border-top: 1px solid var(--ios-border);
             padding: 16px 20px 24px 20px;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             box-shadow: 0 -10px 25px rgba(0,0,0,0.3);
-            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
         }
 
         .ios-card {
@@ -207,14 +163,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 85px;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .ios-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--weed-accent);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            min-height: 78px;
         }
 
         .card-label {
@@ -230,7 +179,6 @@
             font-size: 0.95rem;
             font-weight: 700;
             color: var(--weed-accent);
-            transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
         /* iOS Toggle Switch */
@@ -295,84 +243,25 @@
             cursor: pointer;
             align-self: flex-start;
             margin-top: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .action-chip:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: scale(1.05);
         }
 
         .action-chip:active {
-            transform: scale(0.95);
-        }
-
-        /* Thuisbezorgd Button & Card */
-        .thuisbezorgd-card {
-            background: rgba(255, 128, 0, 0.15);
-            border: 1px solid rgba(255, 128, 0, 0.4);
-        }
-
-        .thuisbezorgd-card:hover {
-            border-color: var(--thuisbezorgd-orange);
-            box-shadow: 0 8px 20px rgba(255, 128, 0, 0.2);
-        }
-
-        .thuisbezorgd-btn {
-            background-color: var(--thuisbezorgd-orange);
-            color: #ffffff;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            text-decoration: none;
-            margin-top: 4px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .thuisbezorgd-btn img {
-            width: 16px;
-            height: 16px;
-            object-fit: contain;
-        }
-
-        .thuisbezorgd-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(255, 128, 0, 0.4);
-        }
-
-        .thuisbezorgd-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Responsive design voor mobiel */
-        @media (max-width: 768px) {
-            .ios-dashboard {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            background: rgba(255, 255, 255, 0.25);
         }
     </style>
 </head>
 <body>
 
-    <!-- iOS Top Bar -->
     <div class="ios-navbar">
         <div class="brand">
-            🌿 NeoXStealth
+            🌿 NeoxStealth
         </div>
         <div class="url-pill">
             <span>🔒</span> neoxchat.com
         </div>
     </div>
 
-    <!-- Main Content Area -->
     <div class="viewport">
-        <!-- Virgil Blocking Alert -->
         <div id="virgil-alert" class="virgil-overlay">
             <div class="ios-alert">
                 <h3>Virgil Detected</h3>
@@ -389,17 +278,14 @@
         </iframe>
     </div>
 
-    <!-- iOS Bottom Control Sheet -->
     <div class="ios-dashboard">
         
-        <!-- VPN Status & Rotator -->
         <div class="ios-card">
             <span class="card-label">Dynamic VPN</span>
             <span id="ip-address" class="ip-value">185.220.101.5</span>
             <button class="action-chip" onclick="rotateIP()">Roteer IP</button>
         </div>
 
-        <!-- VirgilProof Barrier Switch -->
         <div class="ios-card">
             <span class="card-label">Virgil Barrier</span>
             <div class="toggle-row">
@@ -411,20 +297,10 @@
             </div>
         </div>
 
-        <!-- Shield Test -->
         <div class="ios-card">
             <span class="card-label">Shield Test</span>
             <span id="shield-status" style="font-size: 0.75rem; color: var(--text-sub);">Actief</span>
             <button class="action-chip" onclick="simuleerVirgilAanval()">Test Barrier</button>
-        </div>
-
-        <!-- Thuisbezorgd Knop -->
-        <div class="ios-card thuisbezorgd-card">
-            <span class="card-label" style="color: var(--thuisbezorgd-orange);">Thuisbezorgd</span>
-            <a href="https://www.thuisbezorgd.nl" target="_blank" class="thuisbezorgd-btn">
-                <img src="thuisbezorgd.png" alt="Thuisbezorgd Logo" onerror="this.style.display='none'">
-                <span>Bestel eten voor Virgil!</span>
-            </a>
         </div>
 
     </div>
@@ -442,14 +318,11 @@
 
         function rotateIP() {
             const ipDisplay = document.getElementById('ip-address');
-            ipDisplay.style.opacity = '0';
-            ipDisplay.style.transform = 'translateY(-5px)';
-            
+            ipDisplay.style.opacity = '0.3';
             setTimeout(() => {
                 ipDisplay.innerText = generateRandomIP();
                 ipDisplay.style.opacity = '1';
-                ipDisplay.style.transform = 'translateY(0)';
-            }, 200);
+            }, 150);
         }
 
         // Automatic IP Shift
@@ -474,7 +347,7 @@
             }
         }
 
-        // Intercept Simulation
+        // Intercept Simualtion
         function simuleerVirgilAanval() {
             if (virgilProtectionActive) {
                 document.getElementById('virgil-alert').style.display = 'flex';
